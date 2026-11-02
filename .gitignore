@@ -33,6 +33,8 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+# Play upload key (kept outside the repo; never commit)
+*.jks
 .kotlin/
 
 # node.js

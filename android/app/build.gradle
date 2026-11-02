@@ -72,14 +72,27 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+/**
+ * Release signing uses the Play upload key, never the debug keystore. The keystore and its
+ * passwords stay out of the repo, in ~/.gradle/gradle.properties:
+ *   LMP_UPLOAD_STORE_FILE=/absolute/path/to/upload.jks
+ *   LMP_UPLOAD_KEY_ALIAS=upload
+ *   LMP_UPLOAD_STORE_PASSWORD=...
+ *   LMP_UPLOAD_KEY_PASSWORD=...
+ * Without them, packaging a release APK/AAB fails; debug builds are unaffected.
+ */
+def uploadKeyProps = ['LMP_UPLOAD_STORE_FILE', 'LMP_UPLOAD_KEY_ALIAS', 'LMP_UPLOAD_STORE_PASSWORD', 'LMP_UPLOAD_KEY_PASSWORD']
+def missingUploadKeyProps = uploadKeyProps.findAll { !project.hasProperty(it) }
+def hasUploadKey = missingUploadKeyProps.isEmpty()
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.levelmeasurepro"
+    namespace "com.velox.bubble.level"
     defaultConfig {
-        applicationId "com.levelmeasurepro"
+        applicationId "com.velox.bubble.level"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -92,17 +105,34 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        if (hasUploadKey) {
+            release {
+                storeFile file(project.property('LMP_UPLOAD_STORE_FILE'))
+                storePassword project.property('LMP_UPLOAD_STORE_PASSWORD')
+                keyAlias project.property('LMP_UPLOAD_KEY_ALIAS')
+                keyPassword project.property('LMP_UPLOAD_KEY_PASSWORD')
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig hasUploadKey ? signingConfigs.release : null
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+// Never produce an unsigned or debug-signed release: stop before packaging without the upload key.
+tasks.matching { it.name in ['packageRelease', 'packageReleaseBundle'] }.configureEach {
+    doFirst {
+        if (!hasUploadKey) {
+            throw new GradleException(
+                "Release signing is not configured. Add ${missingUploadKeyProps.join(', ')} " +
+                "to ~/.gradle/gradle.properties (see android/app/build.gradle).")
         }
     }
 }

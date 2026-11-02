@@ -1,4 +1,4 @@
-package com.levelmeasurepro
+package com.velox.bubble.level
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

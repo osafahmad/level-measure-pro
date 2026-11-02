@@ -1,4 +1,4 @@
-package com.levelmeasurepro
+package com.velox.bubble.level
 
 import android.app.Application
 import com.facebook.react.PackageList
