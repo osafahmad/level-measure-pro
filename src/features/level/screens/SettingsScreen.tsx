@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Check, ChevronLeft, ChevronRight, Minus, Plus } from 'lucide-react-native';
 import RNRestart from 'react-native-restart';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { DevAdsTools, markJsReload, usePrivacyOptions } from '../../ads';
 import { IconButton } from '../components/IconButton';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { Segmented } from '../components/Segmented';
@@ -104,6 +105,7 @@ export function SettingsScreen({ navigation }: LevelScreenProps<'Settings'>) {
   const insets = useSafeAreaInsets();
   const st = useSettings();
   const resetCalibration = useCalibration(c => c.reset);
+  const privacyOptions = usePrivacyOptions();
 
   const setFrame = (mm: number) =>
     st.update({ frameWidthMm: Math.min(FRAME_WIDTH_MAX_MM, Math.max(FRAME_WIDTH_MIN_MM, mm)) });
@@ -123,7 +125,13 @@ export function SettingsScreen({ navigation }: LevelScreenProps<'Settings'>) {
       // Layout direction only changes after a reload; ask first (architecture.md § 5).
       Alert.alert(i18n.t('settings.restartTitle'), i18n.t('settings.restartBody'), [
         { text: i18n.t('settings.later'), style: 'cancel' },
-        { text: i18n.t('settings.restartNow'), onPress: () => RNRestart.restart() },
+        {
+          text: i18n.t('settings.restartNow'),
+          onPress: () => {
+            markJsReload(); // a reload is not a new launch for App Open ads
+            RNRestart.restart();
+          },
+        },
       ]);
     }
   };
@@ -214,7 +222,9 @@ export function SettingsScreen({ navigation }: LevelScreenProps<'Settings'>) {
           </View>
           <Item label={t('settings.accuracy')} hint={t('settings.accuracyNote')} />
           <Item label={t('settings.privacy')} hint={t('settings.privacyNote')} />
+          {privacyOptions.required ? <LinkItem label={t('ads.privacyChoices')} onPress={privacyOptions.open} /> : null}
         </Section>
+        {__DEV__ ? <DevAdsTools /> : null}
       </ScrollView>
     </View>
   );

@@ -6,6 +6,7 @@ import { List, Settings as SettingsIcon } from 'lucide-react-native';
 import Animated, { Easing, Keyframe, useDerivedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
+import { AdBannerSlot, useSuppressAppOpen } from '../../ads';
 import { IconButton } from '../components/IconButton';
 import { ModeTabs, type TabMode } from '../components/ModeTabs';
 import { SaveReadingSheet } from '../components/SaveReadingSheet';
@@ -63,6 +64,8 @@ export function LevelScreen({ navigation }: LevelScreenProps<'Level'>) {
   const [held, setHeld] = useState<HeldReading | null>(null);
   const [draft, setDraft] = useState<SaveDraft | null>(null);
   const [debug, setDebug] = useState(false);
+  // No App Open ad over a held reading or the save sheet.
+  useSuppressAppOpen(held !== null || draft !== null);
 
   const calibrated = cal.method !== 'none';
   const relative = cal.method === 'zero';
@@ -224,7 +227,7 @@ export function LevelScreen({ navigation }: LevelScreenProps<'Level'>) {
       </ScrollView>
 
       {!held ? (
-        <View style={[styles.toolbar, { paddingBottom: insets.bottom + 12 }]}>
+        <View style={styles.toolbar}>
           <Toolbar
             onCalibrate={openCalibrate}
             onHold={onHold}
@@ -234,8 +237,10 @@ export function LevelScreen({ navigation }: LevelScreenProps<'Level'>) {
           />
         </View>
       ) : (
-        <View style={{ height: insets.bottom + 12 }} />
+        <View style={styles.heldSpacer} />
       )}
+      {/* Owns the bottom safe area; an ad only adds its own height below the toolbar. */}
+      <AdBannerSlot placement="Level" style={styles.banner} />
 
       <SaveReadingSheet
         visible={draft !== null}
@@ -259,5 +264,7 @@ const styles = StyleSheet.create({
   scroll: { flex: 1, marginHorizontal: -space.xl },
   scrollContent: { paddingHorizontal: space.xl, paddingBottom: space.lg },
   tabs: { marginTop: space.lg },
-  toolbar: { paddingTop: space.md },
+  toolbar: { paddingTop: space.md, paddingBottom: space.md },
+  heldSpacer: { height: space.md },
+  banner: { marginHorizontal: -space.xl },
 });

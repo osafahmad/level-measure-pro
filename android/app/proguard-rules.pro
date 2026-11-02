@@ -8,3 +8,6 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+
+# Google UMP consent SDK (react-native-google-mobile-ads docs, "European user consent")
+-keep class com.google.android.gms.internal.consent_sdk.** { *; }

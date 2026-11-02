@@ -1,0 +1,9 @@
+{
+  "ads": {
+    "privacyChoices": "Privacy choices",
+    "devTitle": "ADS (DEBUG)",
+    "devResetConsent": "Reset ad consent and reload",
+    "devGeography": "Debug geography: {{value}}",
+    "devPhase": "Ads phase: {{value}}"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "ads": {
+    "privacyChoices": "رازداری کے انتخاب",
+    "devTitle": "اشتہارات (ڈیبگ)",
+    "devResetConsent": "اشتہاری رضامندی ری سیٹ کر کے ری لوڈ کریں",
+    "devGeography": "ڈیبگ جغرافیہ: {{value}}",
+    "devPhase": "اشتہارات کا مرحلہ: {{value}}"
+  }
+}
