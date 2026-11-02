@@ -41,6 +41,21 @@ describe('normalize', () => {
     expect(v.x).toBeCloseTo((3 / 13) * SIGN.x);
     expect(v.z).toBeCloseTo((12 / 13) * SIGN.z);
   });
+  it.each(['ios', 'android'])(
+    'maps a Reanimated (downward) gravity vector in upright portrait to u.y ≈ +1 on %s',
+    os => {
+      let normalizeFor: typeof normalize = normalize;
+      jest.isolateModules(() => {
+        jest.doMock('react-native', () => ({ Platform: { OS: os } }));
+        normalizeFor = require('../levelMath').normalize;
+      });
+      // Upright portrait: Reanimated reports gravity along −y (pointing down) on both platforms.
+      const u = normalizeFor({ x: 0, y: -9.81, z: 0 });
+      expect(u.y).toBeCloseTo(1, 6);
+      expect(Math.abs(u.x)).toBeCloseTo(0, 6);
+      expect(Math.abs(u.z)).toBeCloseTo(0, 6);
+    },
+  );
   it('does not throw on a zero vector', () => {
     expect(() => normalize({ x: 0, y: 0, z: 0 })).not.toThrow();
     const v = normalize({ x: 0, y: 0, z: 0 });

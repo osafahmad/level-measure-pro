@@ -68,8 +68,8 @@ export const adsConfig = {
    * logcat: the Mobile Ads SDK and UMP each log their own hash for the device.
    */
   testDeviceIds: {
-    mobileAds: [] as string[],
-    ump: [] as string[],
+    mobileAds: ['1EA1609692A91B498D1A4F2B74061C7C'] as string[], // Redmi 13 (Android)
+    ump: ['1EA1609692A91B498D1A4F2B74061C7C'] as string[], // Redmi 13 (Android)
   },
 
   /** GDPR testing. Honoured in __DEV__ builds only; ignored in release. */

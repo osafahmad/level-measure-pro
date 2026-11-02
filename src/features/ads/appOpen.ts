@@ -11,6 +11,11 @@ const AFTER_CLOSE_IGNORE_MS = 2_000;
 type Deps = { getRoute: () => string | undefined; now?: () => number };
 type ShowKind = 'cold' | 'warm';
 
+// One cold-launch attempt per JS runtime. Android can destroy and recreate the Activity while the
+// process (and this runtime) lives on, which remounts AdsProvider and creates a new controller;
+// that is a warm start, so the attempt must not be offered again.
+let coldAttemptUsed = false;
+
 /**
  * App Open ads without useAppOpenAdManager (docs, "Without hooks"), because the hook always
  * auto-shows on warm foreground and cannot honour our launch rules or screen and modal blockers.
@@ -30,8 +35,9 @@ export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
   let showing = false;
   let closedAt = 0;
   let readyAt: number | null = null;
-  // The cold-launch attempt is used up (shown, blocked, too late) or does not apply (JS reload).
-  let coldDone = launchInfo().kind !== 'cold';
+  // The cold-launch attempt is used up (shown, blocked, too late), was used by an earlier controller
+  // in this runtime, or does not apply (JS reload).
+  let coldDone = coldAttemptUsed || launchInfo().kind !== 'cold';
   let appState: string | null | undefined = AppState.currentState;
   let stopped = false;
 
@@ -126,6 +132,7 @@ export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
     if (coldDone || readyAt == null) return;
     const inWindow = now() - readyAt <= config.coldStartWindowMs;
     coldDone = true;
+    coldAttemptUsed = true;
     if (inWindow && show('cold')) return;
     if (!config.warmStartEnabled) discard();
   }

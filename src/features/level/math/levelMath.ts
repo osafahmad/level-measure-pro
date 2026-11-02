@@ -1,12 +1,16 @@
 import { Platform } from 'react-native';
 
 // Sign per device axis so the normalized vector is the canonical "up" vector (sensor-math.md § 2).
-// iOS: Reanimated forwards CoreMotion gravity, which points DOWN → flip all axes.
-// Android: TYPE_GRAVITY already reports the reaction (UP) vector.
-// Verify both with the pose test before shipping; flip a single axis here if a pose does not match.
+// Reanimated delivers gravity pointing DOWN on both platforms, so all axes are flipped:
+// - iOS: Reanimated forwards CoreMotion gravity, which points down.
+// - Android: TYPE_GRAVITY / TYPE_ACCELEROMETER report the UP vector, but Reanimated 4.x negates
+//   them to match iOS (ReanimatedSensorListener.kt). These Android signs depend on that current
+//   Reanimated behavior: repeat the pose test on a physical Android phone after upgrading Reanimated.
+// Android verified with the pose test on a Redmi 13 (Reanimated 4.7.1). Flip a single axis here
+// only if a pose does not match.
 const SIGNS = {
   ios: { x: -1, y: -1, z: -1 },
-  android: { x: 1, y: 1, z: 1 },
+  android: { x: -1, y: -1, z: -1 },
 } as const;
 export const SIGN = Platform.OS === 'ios' ? SIGNS.ios : SIGNS.android;
 const RAD = Math.PI / 180;

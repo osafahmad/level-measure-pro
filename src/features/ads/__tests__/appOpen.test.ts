@@ -154,6 +154,14 @@ describe('App Open: cold launch', () => {
     expect(m.Mock.createForAdRequest).toHaveBeenCalledTimes(1);
   });
 
+  it('does not repeat the cold attempt when Android recreates the Activity in the same runtime', () => {
+    const first = coldLaunchAndLoad();
+    expect(first.show).toHaveBeenCalledTimes(1);
+    first.emit(m.AdEventType.CLOSED);
+    start(); // Back out + relaunch with the process alive: AdsProvider remounts, same JS runtime
+    expect(m.Mock.createForAdRequest).toHaveBeenCalledTimes(1);
+  });
+
   it('does not treat a JS reload (react-native-restart) as a cold launch', () => {
     m = launch();
     m.session.markJsReload();
