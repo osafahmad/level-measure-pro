@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, size, space, type } from '../theme/tokens';
+
+// Android: the Modal's dialog window takes focus slightly after onShow; focusing earlier selects
+// the text but the keyboard is not shown.
+const ANDROID_FOCUS_DELAY_MS = 150;
 
 type Props = {
   visible: boolean;
@@ -17,13 +21,29 @@ export function SaveReadingSheet({ visible, defaultName, summary, onCancel, onSa
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [name, setName] = useState(defaultName);
+  const inputRef = useRef<React.ComponentRef<typeof TextInput>>(null);
+  const focusTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (focusTimer.current) clearTimeout(focusTimer.current);
+  }, []);
+  const focusOnAndroid = () => {
+    focusTimer.current = setTimeout(() => inputRef.current?.focus(), ANDROID_FOCUS_DELAY_MS);
+  };
   useEffect(() => {
     if (visible) setName(defaultName);
   }, [visible, defaultName]);
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onCancel}
+      // Android shows a Modal in its own dialog window; autoFocus runs before that window has
+      // focus, so the keyboard never opens. Focus once the dialog is shown instead.
+      onShow={Platform.OS === 'android' ? focusOnAndroid : undefined}>
+      {/* Edge-to-edge Android no longer resizes the Modal window for the keyboard, so pad on both. */}
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <Pressable style={styles.scrim} onPress={onCancel} accessibilityLabel={t('readings.cancel')} />
         <View style={[styles.sheet, { paddingBottom: insets.bottom + space.md }]}>
           <Text style={styles.title} accessibilityRole="header">
@@ -33,8 +53,9 @@ export function SaveReadingSheet({ visible, defaultName, summary, onCancel, onSa
           <Text style={styles.label}>{t('readings.nameLabel')}</Text>
           <TextInput
             value={name}
+            ref={inputRef}
             onChangeText={setName}
-            autoFocus
+            autoFocus={Platform.OS === 'ios'}
             selectTextOnFocus
             returnKeyType="done"
             onSubmitEditing={() => onSave(name.trim() || defaultName)}

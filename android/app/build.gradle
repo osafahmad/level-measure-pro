@@ -130,7 +130,7 @@ android {
 tasks.matching { it.name in ['packageRelease', 'packageReleaseBundle'] }.configureEach {
     doFirst {
         if (!hasUploadKey) {
-            throw new GradleException(
+            throw new org.gradle.api.GradleException(
                 "Release signing is not configured. Add ${missingUploadKeyProps.join(', ')} " +
                 "to ~/.gradle/gradle.properties (see android/app/build.gradle).")
         }

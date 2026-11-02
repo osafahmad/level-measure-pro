@@ -5,6 +5,7 @@ import {
   useFrameCallback,
   useSharedValue,
 } from 'react-native-reanimated';
+import { scheduleOnUI } from 'react-native-worklets';
 import {
   alphaFor,
   bearingOf,
@@ -24,6 +25,7 @@ export type Offsets = { flat: { x: number; y: number }; edge: [number, number, n
 const SENSOR_CONFIG = { interval: 10, adjustToInterfaceOrientation: false } as const;
 export const ACCEL_MIN_TAU = 150;
 export const STABLE_SIGMA = 0.05;
+const RATE_LISTENER_ID = 0x4c4d50; // listener on the active sensor's shared value (event counter)
 
 /**
  * Gravity sensor → filtered vector → angles, all on the UI thread (animation.md § 2).
@@ -76,9 +78,27 @@ export function useLevelSensor(init: { tau: number; offsets: Offsets; tolerance:
   const slowFlatXRaw = useSharedValue(0);
   const slowFlatYRaw = useSharedValue(0);
   const rateHz = useSharedValue(0);
-  const rateSamples = useSharedValue(0);
+  const rateEvents = useSharedValue(0);
   const rateWindow = useSharedValue(0);
   const wasLevel = useSharedValue(false);
+
+  // Count every event the active sensor delivers: Reanimated sets the sensor's shared value once
+  // per event and calls its listeners synchronously on the UI thread.
+  useEffect(() => {
+    const source = usingAccel ? accel.sensor : gravity.sensor;
+    scheduleOnUI(() => {
+      'worklet';
+      source.addListener(RATE_LISTENER_ID, () => {
+        rateEvents.value += 1;
+      });
+    });
+    return () => {
+      scheduleOnUI(() => {
+        'worklet';
+        source.removeListener(RATE_LISTENER_ID);
+      });
+    };
+  }, [usingAccel, accel, gravity, rateEvents]);
 
   // Settings mirrored to the UI thread (written by LevelSensorProvider).
   const tau = useSharedValue(init.tau);
@@ -94,13 +114,18 @@ export function useLevelSensor(init: { tau: number; offsets: Offsets; tolerance:
     const s = useAccelSource.value ? accel.sensor.value : gravity.sensor.value;
     if (s.x * s.x + s.y * s.y + s.z * s.z < 1e-6) return; // no sample yet (or simulator)
 
-    // Delivered sample rate: count samples that differ from the previous one.
-    const prevS = rawSensor.value;
-    if (prevS.x !== s.x || prevS.y !== s.y || prevS.z !== s.z) rateSamples.value += 1;
+    // Delivered sample rate: sensor events received (counted by the listener below), per second.
+    // Some sensors repeat the same value between updates, so values are not compared here.
+    // The listener keeps counting while this callback is paused (no measuring screen focused);
+    // start a fresh window on the first frame after a pause so those events are not counted.
+    if (info.timeSincePreviousFrame == null || dt > 1000) {
+      rateEvents.value = 0;
+      rateWindow.value = 0;
+    }
     rateWindow.value += dt;
     if (rateWindow.value >= 1000) {
-      rateHz.value = (rateSamples.value * 1000) / rateWindow.value;
-      rateSamples.value = 0;
+      rateHz.value = (rateEvents.value * 1000) / rateWindow.value;
+      rateEvents.value = 0;
       rateWindow.value = 0;
     }
     rawSensor.value = { x: s.x, y: s.y, z: s.z };
