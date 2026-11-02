@@ -40,16 +40,21 @@ export const adsConfig = {
   },
 
   appOpen: {
-    /** Minimum time between two App Open ads (persisted across launches). */
+    /**
+     * One attempt per cold launch (a react-native-restart reload is not one), with no cooldown:
+     * it shows only if an ad is ready this soon after ads became ready (consent + ATT settled).
+     */
+    coldStartWindowMs: 8_000,
+    /** Show when returning from the background. Off: only cold launches show App Open ads. */
+    warmStartEnabled: false,
+    /** Minimum time between App Open ads on warm starts (persisted across launches). */
     cooldownMs: 4 * HOUR,
     /** Google: an App Open ad older than four hours must not be shown. */
     maxAdAgeMs: 4 * HOUR,
-    /** On a cold start, show only if an ad is ready this soon after launch; otherwise keep it. */
-    coldStartWindowMs: 8_000,
     /** Screens an App Open ad may cover. Calibration and Settings (alerts) are excluded. */
     screens: ['Level'] as readonly AdScreen[],
-    /** Google recommends not showing App Open ads on a user's very first session. */
-    skipFirstSession: true,
+    /** true = no App Open ad during a user's very first session. */
+    skipFirstSession: false,
   },
 
   /**

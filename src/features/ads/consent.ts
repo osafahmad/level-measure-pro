@@ -178,9 +178,3 @@ export function resetConsentForTesting() {
   markJsReload();
   RNRestart.restart();
 }
-
-/** Tests only. */
-export function __resetConsentForTests() {
-  started = false;
-  initPromise = null;
-}

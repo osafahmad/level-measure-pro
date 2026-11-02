@@ -61,9 +61,3 @@ export function setAppOpenShownAt(at: number) {
     writeNumber(APP_OPEN_SHOWN_AT, at);
   } catch {}
 }
-
-/** Tests only. `clearStorage: false` simulates the next launch of the same install. */
-export function __resetSessionForTests(clearStorage = true) {
-  launch = null;
-  if (clearStorage) storage.clearAll();
-}

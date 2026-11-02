@@ -9,24 +9,35 @@ import { isAppOpenSuppressed } from './suppress';
 const AFTER_CLOSE_IGNORE_MS = 2_000;
 
 type Deps = { getRoute: () => string | undefined; now?: () => number };
+type ShowKind = 'cold' | 'warm';
 
 /**
- * App Open ads without useAppOpenAdManager (docs, "Without hooks"): we need a cooldown, screen and
- * modal blockers and a first-session skip, which the hook's warm-foreground auto-show cannot honour.
- * One ad is held at a time; it is discarded once older than maxAdAgeMs and replaced after it
- * closes. Nothing here throws: a failed load or show only means no ad this time.
+ * App Open ads without useAppOpenAdManager (docs, "Without hooks"), because the hook always
+ * auto-shows on warm foreground and cannot honour our launch rules or screen and modal blockers.
+ *
+ * - Cold launch: one attempt per launch, no cooldown. The window opens when ads become ready
+ *   (consent + ATT settled), so a first-launch consent flow does not use it up. A JS reload
+ *   (react-native-restart) is not a cold launch.
+ * - Warm start (background → active): only when warmStartEnabled, and then with the cooldown.
+ * One ad is held at a time and discarded once older than maxAdAgeMs. Nothing here throws: a failed
+ * load or show only means no ad this time.
  */
 export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
+  const config = adsConfig.appOpen;
   let ad: AppOpenAd | null = null;
   let loadedAt: number | null = null;
   let loading = false;
   let showing = false;
   let closedAt = 0;
-  let coldOffered = false;
+  let readyAt: number | null = null;
+  // The cold-launch attempt is used up (shown, blocked, too late) or does not apply (JS reload).
+  let coldDone = launchInfo().kind !== 'cold';
   let appState: string | null | undefined = AppState.currentState;
   let stopped = false;
 
   const ready = () => adsConfig.enabled && !stopped && useAdsStore.getState().phase === 'ready';
+  // No requests once nothing could show them.
+  const wantAd = () => !coldDone || config.warmStartEnabled;
 
   function discard() {
     const old = ad;
@@ -39,7 +50,7 @@ export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
   }
 
   function load() {
-    if (!ready() || loading || showing || (ad && loadedAt != null)) return;
+    if (!ready() || !wantAd() || loading || showing || (ad && loadedAt != null)) return;
     discard();
     try {
       const next = AppOpenAd.createForAdRequest(unitId('appOpen'));
@@ -49,7 +60,8 @@ export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
         if (ad !== next) return;
         loading = false;
         loadedAt = now();
-        tryShowColdStart();
+        if (!coldDone) tryColdStart();
+        else if (!config.warmStartEnabled) discard();
       });
       next.addAdEventListener(AdEventType.OPENED, () => setAppOpenShownAt(now()));
       next.addAdEventListener(AdEventType.CLOSED, () => {
@@ -57,14 +69,14 @@ export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
         showing = false;
         closedAt = now();
         discard();
-        load(); // preload the next one
+        load(); // preload the next one (warm starts only)
       });
       next.addAdEventListener(AdEventType.ERROR, () => {
         if (ad !== next) return;
         const failedShow = showing;
         showing = false;
         discard();
-        // A failed load is retried on the next foreground, not in a loop; a failed show reloads.
+        // A failed load is retried on the next warm start, not in a loop; a failed show reloads.
         if (failedShow) load();
       });
       next.load();
@@ -74,22 +86,24 @@ export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
   }
 
   function isFresh() {
-    return loadedAt != null && now() - loadedAt < adsConfig.appOpen.maxAdAgeMs;
+    return loadedAt != null && now() - loadedAt < config.maxAdAgeMs;
   }
 
-  function canShow() {
+  function canShow(kind: ShowKind) {
     if (!ready() || showing || !ad || !isFresh()) return false;
-    if (adsConfig.appOpen.skipFirstSession && launchInfo().sessions <= 1) return false;
-    const last = appOpenShownAt();
-    if (last != null && now() - last < adsConfig.appOpen.cooldownMs) return false;
+    if (config.skipFirstSession && launchInfo().sessions <= 1) return false;
+    if (kind === 'warm') {
+      const last = appOpenShownAt();
+      if (last != null && now() - last < config.cooldownMs) return false;
+    }
     const route = getRoute();
-    if (!route || !(adsConfig.appOpen.screens as readonly string[]).includes(route)) return false;
+    if (!route || !(config.screens as readonly string[]).includes(route)) return false;
     if (isAppOpenSuppressed() || useAdsStore.getState().privacyFormOpen) return false;
     return appState === 'active';
   }
 
-  function show() {
-    if (!canShow() || !ad) return false;
+  function show(kind: ShowKind) {
+    if (!canShow(kind) || !ad) return false;
     const current = ad;
     showing = true;
     try {
@@ -107,20 +121,25 @@ export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
     return true;
   }
 
-  function tryShowColdStart() {
-    if (coldOffered) return;
-    const launch = launchInfo();
-    if (launch.kind !== 'cold' || now() - launch.at > adsConfig.appOpen.coldStartWindowMs) {
-      coldOffered = true; // too late (or a JS reload): keep the ad for the next foreground
-      return;
-    }
-    if (show()) coldOffered = true;
+  /** The single cold-launch attempt: inside the window it shows if nothing blocks it. */
+  function tryColdStart() {
+    if (coldDone || readyAt == null) return;
+    const inWindow = now() - readyAt <= config.coldStartWindowMs;
+    coldDone = true;
+    if (inWindow && show('cold')) return;
+    if (!config.warmStartEnabled) discard();
   }
 
   function onForeground() {
+    if (!config.warmStartEnabled) return;
     if (showing || now() - closedAt < AFTER_CLOSE_IGNORE_MS) return;
     if (ad && loadedAt != null && !isFresh()) discard();
-    if (!show()) load();
+    if (!show('warm')) load();
+  }
+
+  function onReady() {
+    if (readyAt == null) readyAt = now(); // first time this launch only
+    load();
   }
 
   const appStateSub = AppState.addEventListener('change', next => {
@@ -131,11 +150,11 @@ export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
 
   const storeUnsub = useAdsStore.subscribe((s, prev) => {
     if (s.phase === prev.phase) return;
-    if (s.phase === 'ready') load();
+    if (s.phase === 'ready') onReady();
     else if (!showing) discard();
   });
 
-  load();
+  if (ready()) onReady();
 
   return {
     /** Unmount: stop listening and drop the held ad. */
@@ -144,10 +163,6 @@ export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
       appStateSub.remove();
       storeUnsub();
       if (!showing) discard();
-    },
-    /** For tests and diagnostics. */
-    get state() {
-      return { loaded: ad != null && loadedAt != null, loading, showing, loadedAt };
     },
   };
 }
