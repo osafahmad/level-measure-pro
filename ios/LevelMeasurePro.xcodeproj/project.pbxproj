@@ -7,12 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02ABAE1231734484A8CEAD2E /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D3621DE4C5B04B55B5C432E9 /* Inter-Regular.ttf */; };
 		0C80B921A6F3F58F76C31292 /* libPods-LevelMeasurePro.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-LevelMeasurePro.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		2C7B177B4C764BCCB7BE9FC4 /* JetBrainsMono-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A51B2DBA64B64548AF9414E1 /* JetBrainsMono-SemiBold.ttf */; };
+		56CAFD502FD74AF6B6FCB785 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 89B1615D1ECA406A902C55A7 /* Inter-SemiBold.ttf */; };
+		5A73EF149A93494E9D787C9F /* JetBrainsMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AAAA61D0F2E5411AAB5E2068 /* JetBrainsMono-Medium.ttf */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		761780EF2CA45674006654EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EE2CA45674006654EF /* SceneDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		BB776B3C25ED164C36C64D97 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		C916616321214269ACDE0D57 /* JetBrainsMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C0EC8DD1E5448BD96BE67B7 /* JetBrainsMono-Regular.ttf */; };
+		F5D555ED1ECB4C55B0AC089B /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6543946729A74197A5B77270 /* Inter-Medium.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,9 +29,15 @@
 		3B4392A12AC88292D35C810B /* Pods-LevelMeasurePro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LevelMeasurePro.debug.xcconfig"; path = "Target Support Files/Pods-LevelMeasurePro/Pods-LevelMeasurePro.debug.xcconfig"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-LevelMeasurePro.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LevelMeasurePro.release.xcconfig"; path = "Target Support Files/Pods-LevelMeasurePro/Pods-LevelMeasurePro.release.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-LevelMeasurePro.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LevelMeasurePro.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6543946729A74197A5B77270 /* Inter-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 524332266777; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Medium.ttf"; path = "../assets/fonts/Inter-Medium.ttf"; sourceTree = "<group>"; };
+		6C0EC8DD1E5448BD96BE67B7 /* JetBrainsMono-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 524332266777; includeInIndex = 0; lastKnownFileType = unknown; name = "JetBrainsMono-Regular.ttf"; path = "../assets/fonts/JetBrainsMono-Regular.ttf"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = LevelMeasurePro/AppDelegate.swift; sourceTree = "<group>"; };
 		761780EE2CA45674006654EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = LevelMeasurePro/SceneDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = LevelMeasurePro/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		89B1615D1ECA406A902C55A7 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 524332266777; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-SemiBold.ttf"; path = "../assets/fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		A51B2DBA64B64548AF9414E1 /* JetBrainsMono-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 524332266777; includeInIndex = 0; lastKnownFileType = unknown; name = "JetBrainsMono-SemiBold.ttf"; path = "../assets/fonts/JetBrainsMono-SemiBold.ttf"; sourceTree = "<group>"; };
+		AAAA61D0F2E5411AAB5E2068 /* JetBrainsMono-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 524332266777; includeInIndex = 0; lastKnownFileType = unknown; name = "JetBrainsMono-Medium.ttf"; path = "../assets/fonts/JetBrainsMono-Medium.ttf"; sourceTree = "<group>"; };
+		D3621DE4C5B04B55B5C432E9 /* Inter-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 524332266777; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Regular.ttf"; path = "../assets/fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -63,6 +75,19 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		42F6AAEA05BE44209487EF18 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6543946729A74197A5B77270 /* Inter-Medium.ttf */,
+				6C0EC8DD1E5448BD96BE67B7 /* JetBrainsMono-Regular.ttf */,
+				D3621DE4C5B04B55B5C432E9 /* Inter-Regular.ttf */,
+				A51B2DBA64B64548AF9414E1 /* JetBrainsMono-SemiBold.ttf */,
+				AAAA61D0F2E5411AAB5E2068 /* JetBrainsMono-Medium.ttf */,
+				89B1615D1ECA406A902C55A7 /* Inter-SemiBold.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -78,6 +103,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				42F6AAEA05BE44209487EF18 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -164,6 +190,12 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				BB776B3C25ED164C36C64D97 /* PrivacyInfo.xcprivacy in Resources */,
+				F5D555ED1ECB4C55B0AC089B /* Inter-Medium.ttf in Resources */,
+				C916616321214269ACDE0D57 /* JetBrainsMono-Regular.ttf in Resources */,
+				02ABAE1231734484A8CEAD2E /* Inter-Regular.ttf in Resources */,
+				2C7B177B4C764BCCB7BE9FC4 /* JetBrainsMono-SemiBold.ttf in Resources */,
+				5A73EF149A93494E9D787C9F /* JetBrainsMono-Medium.ttf in Resources */,
+				56CAFD502FD74AF6B6FCB785 /* Inter-SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,9 +226,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-LevelMeasurePro/Pods-LevelMeasurePro-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-LevelMeasurePro/Pods-LevelMeasurePro-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -233,9 +269,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-LevelMeasurePro/Pods-LevelMeasurePro-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-LevelMeasurePro/Pods-LevelMeasurePro-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -264,8 +304,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3LXGVY6PSJ;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = LevelMeasurePro/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Level Measure Pro";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -277,7 +320,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.velox.bubble.level;
 				PRODUCT_NAME = LevelMeasurePro;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -294,7 +337,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3LXGVY6PSJ;
 				INFOPLIST_FILE = LevelMeasurePro/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Level Measure Pro";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -306,7 +352,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.velox.bubble.level;
 				PRODUCT_NAME = LevelMeasurePro;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;
