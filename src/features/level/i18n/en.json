@@ -13,6 +13,7 @@
     "live": "LIVE",
     "hz": "Hz",
     "calibrateHint": "Calibrate for ±0.1° accuracy",
+    "notCalibrated": "Not calibrated",
     "unavailable": "Motion sensor not available on this device"
   },
   "overline": {

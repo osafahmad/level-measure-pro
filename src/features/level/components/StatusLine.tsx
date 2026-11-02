@@ -6,7 +6,7 @@ import { AnimatedText } from './AnimatedText';
 
 type Props = {
   rateHz: SharedValue<number>;
-  /** "±0.1°" once calibrated, "±0.5°" before. Omitted on the held screen. */
+  /** "±0.1°" once calibrated, "Not calibrated" before. Omitted on the held screen. */
   accuracy?: string;
   live: boolean;
   liveLabel: string;
