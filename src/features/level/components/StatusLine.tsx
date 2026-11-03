@@ -23,15 +23,26 @@ export function StatusLine({ rateHz, accuracy, live, liveLabel, hzLabel, liveVal
     return accuracy ? `${head} · ${hz} ${hzLabel} · ${accuracy}` : `${head} · ${hz} ${hzLabel}`;
   });
   return (
-    <View style={styles.row}>
-      <View style={[styles.dot, { backgroundColor: live ? colors.ok : colors.textFaint }]} />
-      <AnimatedText text={text} style={styles.text} />
+    <View>
+      <View style={styles.row}>
+        <View style={[styles.dot, { backgroundColor: live ? colors.ok : colors.textFaint }]} />
+        <AnimatedText text={text} style={styles.text} multiline />
+      </View>
+      <View style={styles.reserve} />
     </View>
   );
 }
 
+const TEXT_MIN_WIDTH = 200;
+const DOT = 6;
+const GAP = 6;
+
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
-  dot: { width: 6, height: 6, borderRadius: 3 },
-  text: { ...type.status, color: colors.textMuted, minWidth: 200 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: GAP, marginTop: 2 },
+  dot: { width: DOT, height: DOT, borderRadius: DOT / 2 },
+  text: { ...type.status, color: colors.textMuted, flexGrow: 1, flexShrink: 1 },
+  // Zero-height: asks the header for room for a 200 pt line, so the line is exactly as wide as before
+  // wherever that fits. Where it does not (narrow phones, large text), the header gives less and the
+  // line shrinks and wraps instead of running under the header buttons.
+  reserve: { width: DOT + GAP + TEXT_MIN_WIDTH, height: 0 },
 });
