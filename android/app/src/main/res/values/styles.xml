@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
@@ -10,6 +10,11 @@
         <item name="android:statusBarColor">@color/splash_background</item>
         <item name="android:navigationBarColor">@color/splash_background</item>
         <item name="android:windowLightStatusBar">false</item>
+        <!-- API 29+: with the transparent edge-to-edge bar and 3-button navigation, the system
+             otherwise draws a light-grey scrim in light mode, and RN then picks dark buttons that
+             vanish on the dark UI. false = no scrim, and the theme's light buttons stay. Ignored
+             below API 29. -->
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
     </style>
 
 </resources>

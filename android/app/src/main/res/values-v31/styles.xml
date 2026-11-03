@@ -13,6 +13,8 @@
         <item name="android:statusBarColor">@color/splash_background</item>
         <item name="android:navigationBarColor">@color/splash_background</item>
         <item name="android:windowLightStatusBar">false</item>
+        <!-- No light-grey nav bar scrim; see values/styles.xml. -->
+        <item name="android:enforceNavigationBarContrast">false</item>
         <item name="android:windowSplashScreenBackground">@color/splash_background</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon_canvas</item>
     </style>
