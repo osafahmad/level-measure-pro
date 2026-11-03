@@ -22,7 +22,7 @@ import {
   type Tolerance,
 } from '../state/settingsStore';
 import { colors, ltr, radius, size, space, type } from '../theme/tokens';
-import { version } from '../../../../package.json';
+import { APP_VERSION } from '../../../appVersion';
 
 const FRAME_STEP_MM = 50;
 const SMOOTHING_KEY: Record<Smoothing, string> = {
@@ -218,7 +218,7 @@ export function SettingsScreen({ navigation }: LevelScreenProps<'Settings'>) {
         <Section title={t('settings.about')}>
           <View style={[styles.item, styles.rowItem]}>
             <Text style={styles.itemLabel}>{t('settings.version')}</Text>
-            <Text style={styles.mono}>{version}</Text>
+            <Text style={styles.mono}>{APP_VERSION}</Text>
           </View>
           <Item label={t('settings.accuracy')} hint={t('settings.accuracyNote')} />
           <Item label={t('settings.privacy')} hint={t('settings.privacyNote')} />
