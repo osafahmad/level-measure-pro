@@ -6,7 +6,7 @@ import { AnimatedText } from './AnimatedText';
 
 type Props = {
   rateHz: SharedValue<number>;
-  /** "±0.1°" once calibrated, "Not calibrated" before. Omitted on the held screen. */
+  /** Calibration state: "Calibrated", "Zero set (REL)" or "Not calibrated". Omitted on the held screen. */
   accuracy?: string;
   live: boolean;
   liveLabel: string;
@@ -15,7 +15,7 @@ type Props = {
   liveValue?: SharedValue<string>;
 };
 
-/** Green dot + `LIVE · 100 Hz · ±0.1°` (mono 11, textMuted). */
+/** Green dot + `LIVE · <measured rate> Hz · Calibrated` (mono 11, textMuted). */
 export function StatusLine({ rateHz, accuracy, live, liveLabel, hzLabel, liveValue }: Props) {
   const text = useDerivedValue(() => {
     const hz = rateHz.value > 0 ? Math.round(rateHz.value).toString() : '—';

@@ -12,7 +12,9 @@
   "status": {
     "live": "LIVE",
     "hz": "Hz",
-    "calibrateHint": "Calibrate for ±0.1° accuracy",
+    "calibrateHint": "Calibrate before careful work",
+    "calibrated": "Calibrated",
+    "zeroSet": "Zero set (REL)",
     "notCalibrated": "Not calibrated",
     "unavailable": "Motion sensor not available on this device"
   },

@@ -73,8 +73,8 @@ export function LevelScreen({ navigation }: LevelScreenProps<'Level'>) {
 
   const calibrated = cal.method !== 'none';
   const relative = cal.method === 'zero';
-  // Before calibration a phone can be off by a degree or more, so promise no figure.
-  const accuracy = calibrated ? '±0.1°' : t('status.notCalibrated');
+  // Calibration state only, never an accuracy figure: nothing here measures accuracy.
+  const accuracy = t(relative ? 'status.zeroSet' : calibrated ? 'status.calibrated' : 'status.notCalibrated');
 
   const liveValue = useDerivedValue(() => formatPrimary(s.primary.value, s.units.value));
 
