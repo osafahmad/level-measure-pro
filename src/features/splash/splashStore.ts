@@ -4,7 +4,7 @@ import { launchInfo } from '../ads';
 
 /**
  * Splash hold per platform, counted from bundle load. Aim: ~3.0 s from tap to fade start (tune on
- * device). Android loads the bundle later after the tap (~1.4 s on a Redmi 13 release build), so
+ * device). Android loads the bundle later after the tap (~1.1 s on a Redmi 13 release build), so
  * its hold is shorter.
  */
 export const SPLASH_HOLD_MS_BY_OS = { ios: 2600, android: 1450 } as const;
