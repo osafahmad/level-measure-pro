@@ -185,6 +185,25 @@ describe('App Open: cold launch', () => {
     expect(ad.destroy).toHaveBeenCalled();
   });
 
+  it('skipColdStart (backgrounded during the splash) gives up the launch attempt before any request', () => {
+    m = launch();
+    m.useAdsStore.setState({ phase: 'consent' });
+    start();
+    controller!.skipColdStart();
+    m.useAdsStore.setState({ phase: 'ready' });
+    expect(m.Mock.createForAdRequest).not.toHaveBeenCalled();
+  });
+
+  it('skipColdStart drops an ad that is already loading', () => {
+    m = launch();
+    start();
+    const ad = m.lastAd();
+    controller!.skipColdStart();
+    ad.emit(m.AdEventType.LOADED);
+    expect(ad.show).not.toHaveBeenCalled();
+    expect(ad.destroy).toHaveBeenCalled();
+  });
+
   it('survives a show() that rejects', async () => {
     m = launch();
     start();

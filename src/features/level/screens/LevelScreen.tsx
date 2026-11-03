@@ -7,6 +7,7 @@ import Animated, { Easing, Keyframe, useDerivedValue } from 'react-native-reanim
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 import { AdBannerSlot, useSuppressAppOpen } from '../../ads';
+import { isSplashBlocking, useSplash } from '../../splash';
 import { IconButton } from '../components/IconButton';
 import { ModeTabs, type TabMode } from '../components/ModeTabs';
 import { SaveReadingSheet } from '../components/SaveReadingSheet';
@@ -57,7 +58,10 @@ export function LevelScreen({ navigation }: LevelScreenProps<'Level'>) {
   const readings = useReadings(st => st.readings);
   const addReading = useReadings(st => st.add);
 
-  const ev = useLevelEvents(s, { enabled: isFocused, levelAnnouncement: t('a11y.levelReached') });
+  // Under the launch splash the sensors keep running (no stale first frame); only haptics and
+  // announcements wait for the splash to end.
+  const splashUp = useSplash(st => isSplashBlocking(st.phase));
+  const ev = useLevelEvents(s, { enabled: isFocused && !splashUp, levelAnnouncement: t('a11y.levelReached') });
   const color = useStateColor(s);
 
   const [auto, setAuto] = useState(true);

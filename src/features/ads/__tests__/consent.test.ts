@@ -11,7 +11,14 @@ const flush = async () => {
 /** Fresh modules per test (new JS runtime), so the once-per-launch guards start clean. */
 function load() {
   jest.resetModules();
-  require('react-native').AppState.currentState = 'active';
+  const RN = require('react-native');
+  RN.AppState.currentState = 'active';
+  const appStateListeners = new Set<(s: string) => void>();
+  jest.spyOn(RN.AppState, 'addEventListener').mockImplementation((...args: unknown[]) => {
+    const fn = args[1] as (s: string) => void;
+    appStateListeners.add(fn);
+    return { remove: () => appStateListeners.delete(fn) };
+  });
   const ads = require('react-native-google-mobile-ads');
   const permissions = require('react-native-permissions');
   const consent = ads.AdsConsent as Record<string, jest.Mock>;
@@ -27,6 +34,11 @@ function load() {
     request: permissions.request as jest.Mock,
     RESULTS: permissions.RESULTS,
     useAdsStore: require('../adsStore').useAdsStore,
+    createForAdRequest: ads.AppOpenAd.createForAdRequest as jest.Mock,
+    setAppState: (next: string) => {
+      RN.AppState.currentState = next;
+      [...appStateListeners].forEach(fn => fn(next));
+    },
     adsConfig: require('../config').adsConfig,
     ...(require('../consent') as typeof import('../consent')),
   };
@@ -37,6 +49,10 @@ const phase = () => m.useAdsStore.getState().phase;
 
 beforeEach(() => {
   m = load();
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 describe('consent flow', () => {
@@ -135,5 +151,78 @@ describe('consent flow', () => {
     } finally {
       g.__DEV__ = true;
     }
+  });
+});
+
+describe('prewarmAds (runs under the splash)', () => {
+  it('does nothing on a fresh install, when no previous consent allows ads', async () => {
+    m.consent.getConsentInfo.mockResolvedValue(info(false));
+    m.prewarmAds();
+    await flush();
+    expect(m.sdk.initialize).not.toHaveBeenCalled();
+    expect(phase()).toBe('idle');
+  });
+
+  it('only starts the SDK from previous consent: no UI, no ad request, never marks ads ready', async () => {
+    m.prewarmAds();
+    await flush();
+    expect(m.sdk.initialize).toHaveBeenCalledTimes(1);
+    expect(m.consent.gatherConsent).not.toHaveBeenCalled();
+    expect(m.request).not.toHaveBeenCalled();
+    expect(m.createForAdRequest).not.toHaveBeenCalled();
+    expect(phase()).toBe('idle');
+    expect(m.useAdsStore.getState().sdkInitialized).toBe(true);
+  });
+
+  it('never initializes the SDK twice once startAds runs after it', async () => {
+    m.prewarmAds();
+    await flush();
+    m.startAds();
+    await flush();
+    expect(m.sdk.initialize).toHaveBeenCalledTimes(1);
+    expect(m.consent.getConsentInfo).toHaveBeenCalledTimes(2); // prewarm + settle, not a second prewarm
+    expect(phase()).toBe('ready');
+  });
+
+  it('retries once in settle when the prewarm init failed', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    m.sdk.initialize.mockRejectedValueOnce(new Error('init failed'));
+    m.prewarmAds();
+    await flush();
+    m.startAds();
+    await flush();
+    expect(m.sdk.initialize).toHaveBeenCalledTimes(2);
+    expect(phase()).toBe('ready');
+    warn.mockRestore();
+  });
+
+  it('swallows a consent read failure', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    m.consent.getConsentInfo.mockRejectedValue(new Error('broken'));
+    expect(() => m.prewarmAds()).not.toThrow();
+    await flush();
+    expect(m.sdk.initialize).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('does nothing when ads are disabled', async () => {
+    (m.adsConfig as { enabled: boolean }).enabled = false;
+    m.prewarmAds();
+    await flush();
+    expect(m.consent.getConsentInfo).not.toHaveBeenCalled();
+    expect(m.sdk.initialize).not.toHaveBeenCalled();
+  });
+});
+
+describe('ATT timing', () => {
+  it('requests ATT only once the app is active', async () => {
+    m.setAppState('inactive');
+    m.startAds();
+    await flush();
+    expect(m.request).not.toHaveBeenCalled();
+    m.setAppState('active');
+    await flush();
+    expect(m.request).toHaveBeenCalledTimes(1);
+    expect(phase()).toBe('ready');
   });
 });

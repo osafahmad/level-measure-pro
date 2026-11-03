@@ -1,0 +1,20 @@
+<resources>
+
+    <!-- Android 12+: same theme, plus the system splash (which cannot show text) set to match.
+         The system splash rasterizes the icon at a size of its own and scales it, so the icon must
+         scale with its bounds: splash_icon_canvas is a bitmap (drawable-*dpi), a 288dp canvas with
+         splash_icon (200dp) centered, padding transparent. A layer-list with dp sizes or insets
+         does not scale and shows cropped and off-center. Regenerate per density from splash_icon:
+           ffmpeg -i splash_icon.png -vf "format=rgba,pad=C:C:(ow-iw)/2:(oh-ih)/2:color=0x00000000" splash_icon_canvas.png
+         with C = 288dp in px (288, 432, 576, 864, 1152). -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <item name="android:windowBackground">@drawable/splash_window</item>
+        <item name="android:statusBarColor">@color/splash_background</item>
+        <item name="android:navigationBarColor">@color/splash_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowSplashScreenBackground">@color/splash_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon_canvas</item>
+    </style>
+
+</resources>

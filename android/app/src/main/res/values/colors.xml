@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash background: the icon artwork's own background (assets/icon/app-icon.png), so the
+         icon's edge is invisible. Must match SPLASH_BG in src/features/splash/Splash.tsx. -->
+    <color name="splash_background">#0E1116</color>
+</resources>

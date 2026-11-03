@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Window background on every Android version: the whole native splash before Android 12, and the
+     frame between the system splash and the JS splash on 12+. The icon is 200dp at the exact
+     screen center, matching SPLASH_ICON_SIZE in src/features/splash/Splash.tsx. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/splash_background" />
+    <item
+        android:width="200dp"
+        android:height="200dp"
+        android:gravity="center"
+        android:drawable="@drawable/splash_icon" />
+</layer-list>

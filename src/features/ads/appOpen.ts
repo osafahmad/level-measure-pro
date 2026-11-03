@@ -164,6 +164,12 @@ export function createAppOpenController({ getRoute, now = Date.now }: Deps) {
   if (ready()) onReady();
 
   return {
+    /** Give up this launch's cold attempt (the app went to the background during the splash). */
+    skipColdStart() {
+      coldDone = true;
+      coldAttemptUsed = true;
+      if (!showing && !config.warmStartEnabled) discard();
+    },
     /** Unmount: stop listening and drop the held ad. */
     stop() {
       stopped = true;

@@ -126,19 +126,30 @@ async function startFromPreviousSession() {
   }
 }
 
+let prewarmed = false;
 let started = false;
 
-/** Runs once per JS runtime. Never awaited by the UI. */
-export function startAds() {
-  if (started || !adsConfig.enabled) return;
-  started = true;
-  setState({ phase: 'consent' });
+/**
+ * No UI and no ad requests: only starts the SDK from the previous session's consent, if that
+ * consent allows ads (nothing on a fresh install). Safe under the splash. Once per JS runtime.
+ */
+export function prewarmAds() {
+  if (prewarmed || !adsConfig.enabled) return;
+  prewarmed = true;
   try {
     if (__DEV__ && adsConfig.debug.resetConsentOnLaunch) AdsConsent.reset();
   } catch (e) {
     log('reset failed', e);
   }
   startFromPreviousSession();
+}
+
+/** Runs once per JS runtime, only while the app is active (UMP may show a form). Never awaited by the UI. */
+export function startAds() {
+  if (started || !adsConfig.enabled) return;
+  started = true;
+  setState({ phase: 'consent' });
+  prewarmAds();
   AdsConsent.gatherConsent(umpOptions())
     .catch(e => log('gatherConsent failed; using existing consent', e))
     .then(settle)
