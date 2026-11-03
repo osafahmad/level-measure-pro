@@ -11,6 +11,7 @@ import { Segmented } from '../components/Segmented';
 import i18n, { applyDirection, directionMatches, type Language } from '../i18n';
 import { UNITS_CYCLE, type Units } from '../math/levelMath';
 import type { LevelScreenProps } from '../navigation';
+import { openPrivacyPolicy } from '../platform/links';
 import { useCalibration } from '../state/calibrationStore';
 import {
   FRAME_WIDTH_MAX_MM,
@@ -222,6 +223,7 @@ export function SettingsScreen({ navigation }: LevelScreenProps<'Settings'>) {
           </View>
           <Item label={t('settings.accuracy')} hint={t('settings.accuracyNote')} />
           <Item label={t('settings.privacy')} hint={t('settings.privacyNote')} />
+          <LinkItem label={t('settings.privacyPolicy')} onPress={openPrivacyPolicy} />
           {privacyOptions.required ? <LinkItem label={t('ads.privacyChoices')} onPress={privacyOptions.open} /> : null}
         </Section>
         {__DEV__ ? <DevAdsTools /> : null}
