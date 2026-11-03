@@ -1,4 +1,4 @@
-import { I18nManager } from 'react-native';
+import { I18nManager, Platform } from 'react-native';
 
 export const colors = {
   bg: '#0B0D10',            // screen background
@@ -52,14 +52,39 @@ const tabular = { fontVariant: ['tabular-nums' as const] };
 // mono font there. Direction is fixed for the app's lifetime, so this is resolved once at load.
 const rtl = I18nManager.isRTL;
 
+/**
+ * Inter has no Urdu glyphs, so iOS draws Urdu in the system Nastaliq face but sized each line from
+ * Inter (ascent 0.97 em against Nastaliq's 1.9 em), clipping the tops: ک read as ل. Urdu on iOS
+ * therefore uses Nastaliq itself, with its own line height. Its ink still overhangs that box (up
+ * to 0.33 em above it, 0.08 em below, and an initial ک's stroke 0.45 em past the start edge, measured over every
+ * Urdu string), and iOS clips text to its view, so Urdu text gets that much padding, sized for
+ * the largest size each style is rendered at. Android keeps Inter (fallback glyphs get their own
+ * line spacing), and LTR is unchanged everywhere.
+ */
+const urduIOS = rtl && Platform.OS === 'ios';
+function words(family: string, maxFontSize: number, bold = false) {
+  if (!urduIOS) return { fontFamily: family };
+  const x = Math.ceil(maxFontSize * (bold ? 0.45 : 0.38));
+  const top = Math.ceil(maxFontSize * (bold ? 0.33 : 0.14));
+  const bottom = bold ? Math.ceil(maxFontSize * 0.08) : 0;
+  return {
+    fontFamily: bold ? 'NotoNastaliqUrdu-Bold' : 'NotoNastaliqUrdu',
+    paddingHorizontal: x,
+    paddingTop: top,
+    paddingBottom: bottom,
+  };
+}
+/** A fixed line height would clip Nastaliq again, so iOS Urdu drops it. */
+export const textSize = (fontSize: number, lineHeight: number) => (urduIOS ? { fontSize } : { fontSize, lineHeight });
+
 export const type = {
-  title: { fontFamily: fonts.sansSemi, fontSize: 20, letterSpacing: -0.2 },
-  h2: { fontFamily: fonts.sansSemi, fontSize: 18 },
-  body: { fontFamily: fonts.sans, fontSize: 14, lineHeight: 21 },
-  label: { fontFamily: fonts.sans, fontSize: 11 },
-  button: { fontFamily: fonts.sansMedium, fontSize: 12 },
-  cardTitle: { fontFamily: fonts.sansSemi, fontSize: 12, letterSpacing: rtl ? 0 : 0.6 },
-  overline: { fontFamily: rtl ? fonts.sans : fonts.mono, fontSize: 11, letterSpacing: rtl ? 0 : 1, ...tabular },
+  title: { ...words(fonts.sansSemi, 20, true), fontSize: 20, letterSpacing: rtl ? 0 : -0.2 },
+  h2: { ...words(fonts.sansSemi, 18, true), fontSize: 18 },
+  body: { ...words(fonts.sans, 14), ...textSize(14, 21) },
+  label: { ...words(fonts.sans, 12), fontSize: 11 },
+  button: { ...words(fonts.sansMedium, 14), fontSize: 12 },
+  cardTitle: { ...words(fonts.sansSemi, 12, true), fontSize: 12, letterSpacing: rtl ? 0 : 0.6 },
+  overline: { ...(rtl ? words(fonts.sans, 11) : { fontFamily: fonts.mono }), fontSize: 11, letterSpacing: rtl ? 0 : 1, ...tabular },
   readoutXL: { fontFamily: fonts.monoSemi, fontSize: 64, letterSpacing: -2, ...tabular },   // edge
   readoutL: { fontFamily: fonts.monoSemi, fontSize: 52, letterSpacing: -2, ...tabular },    // flat
   readoutHeld: { fontFamily: fonts.monoSemi, fontSize: 76, letterSpacing: -2, ...tabular }, // hold
@@ -67,7 +92,7 @@ export const type = {
   valueSm: { fontFamily: fonts.monoMedium, fontSize: 13, ...tabular },
   diag: { fontFamily: fonts.mono, fontSize: 11, ...tabular },
   /** Status line: words + numbers (mono in LTR, sans in RTL). */
-  status: { fontFamily: rtl ? fonts.sans : fonts.mono, fontSize: 11, ...tabular },
+  status: { ...(rtl ? words(fonts.sans, 11) : { fontFamily: fonts.mono }), fontSize: 11, ...tabular },
 } as const;
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24 } as const;

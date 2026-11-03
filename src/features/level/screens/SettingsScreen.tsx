@@ -22,7 +22,7 @@ import {
   type Smoothing,
   type Tolerance,
 } from '../state/settingsStore';
-import { colors, ltr, radius, size, space, type } from '../theme/tokens';
+import { colors, ltr, radius, size, space, textSize, type } from '../theme/tokens';
 import { APP_VERSION } from '../../../appVersion';
 
 const FRAME_STEP_MM = 50;
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   itemHead: { flexDirection: 'row', alignItems: 'center' },
   itemText: { flex: 1, gap: 2, paddingRight: space.md },
   itemLabel: { ...type.body, color: colors.text },
-  itemHint: { ...type.label, fontSize: 12, lineHeight: 17, color: colors.textMuted },
+  itemHint: { ...type.label, ...textSize(12, 17), color: colors.textMuted },
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', direction: 'ltr' },
   stepValue: { ...type.value, color: colors.text, ...ltr },
   mono: { ...type.valueSm, color: colors.textMuted, ...ltr },
